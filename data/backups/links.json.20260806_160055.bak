@@ -1,0 +1,90 @@
+[
+    {
+        "id": "lnk_59f1ba768eee",
+        "title": "واتساب - الدعم الفني - (التقسيط والمعارض)",
+        "url": "https://wa.me/972592633343",
+        "icon": "icon_4e181cf708a05bbd.png",
+        "icon_source": "upload",
+        "type": "whatsapp",
+        "active": true,
+        "order": 1,
+        "show_copy": true
+    },
+    {
+        "id": "lnk_278c12f81fad",
+        "title": "واتساب - خدمة العملاء - (حسابات الجملة)",
+        "url": "https://wa.me/972595671331",
+        "icon": "icon_653d6fbfd5aa30a6.png",
+        "icon_source": "upload",
+        "type": "whatsapp",
+        "active": true,
+        "order": 2,
+        "show_copy": true
+    },
+    {
+        "id": "lnk_ce8e4469fe7c",
+        "title": "أبو زهرة إلكترونيك - AtoZ.ps",
+        "url": "https://www.facebook.com/atoz.ps.electronic",
+        "icon": "",
+        "icon_source": "auto",
+        "type": "facebook",
+        "active": true,
+        "order": 3,
+        "show_copy": false
+    },
+    {
+        "id": "lnk_869732448330",
+        "title": "أبو زهرة للأجهزة الكهربائية - AtoZ.ps",
+        "url": "https://www.facebook.com/atoz.ps.electronics",
+        "icon": "",
+        "icon_source": "auto",
+        "type": "facebook",
+        "active": true,
+        "order": 4,
+        "show_copy": false
+    },
+    {
+        "id": "lnk_ig_electronics",
+        "title": "أبو زهرة إلكترونيك - AtoZ.ps",
+        "url": "https://www.instagram.com/atoz.ps.electronic",
+        "icon": "",
+        "icon_source": "auto",
+        "type": "instagram",
+        "active": true,
+        "order": 5,
+        "show_copy": false
+    },
+    {
+        "id": "lnk_ig_appliances",
+        "title": "أبو زهرة للأجهزة الكهربائية - AtoZ.ps",
+        "url": "https://www.instagram.com/atoz.ps.electronics",
+        "icon": "",
+        "icon_source": "auto",
+        "type": "instagram",
+        "active": true,
+        "order": 6,
+        "show_copy": false
+    },
+    {
+        "id": "lnk_2b7384c8fec4",
+        "title": "AtoZ.ps - ابو زهرة الكترونيك",
+        "url": "https://www.youtube.com/@AtoZ.abuzahra",
+        "icon": "",
+        "icon_source": "auto",
+        "type": "website",
+        "active": true,
+        "order": 7,
+        "show_copy": false
+    },
+    {
+        "id": "lnk_e43e69522579",
+        "title": "أبو زهرة إلكترونيك - AtoZ.ps",
+        "url": "https://www.tiktok.com/@atoz.ps.electronic",
+        "icon": "icon_39878855246b3f06.png",
+        "icon_source": "upload",
+        "type": "custom",
+        "active": true,
+        "order": 8,
+        "show_copy": false
+    }
+]

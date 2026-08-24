@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AtoZ.ps — أبو زهرة للإلكترونيات</title>
+<meta name="description" content="وجهتك الأولى في فلسطين — إلكترونيات، أجهزة كهربائية، اكسسوارات">
+<meta name="robots" content="index, follow">
+<!-- Open Graph -->
+<meta property="og:title" content="AtoZ Store — أبو زهرة للإلكترونيات">
+<meta property="og:description" content="وجهتك الأولى في فلسطين — Expect More...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://qr.atoz.ps/">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+<!-- React & ReactDOM (CDN) -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<!-- Babel for JSX transformation -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- Stylesheet -->
+<link rel="stylesheet" href="assets/css/style.css?v=3">
+<div id="tracking-head-container"></div>
+</head>
+<body>
+<div id="root"></div>
+<div id="tracking-body-container"></div>
+<script type="text/babel">
+
+/* =============================================================
+   AtoZ Store — React Frontend (CDN Version)
+   ============================================================= */
+
+const { useState, useEffect, useMemo, useCallback } = React;
+
+// Built-in inline SVG icons for common types
+const TYPE_ICONS = {
+  whatsapp:  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%2325D366"/><path fill="%23fff" d="M23 9a9.9 9.9 0 0 0-16.9 7.1c0 1.6.4 3.1 1.2 4.4L6 27l6.7-1.8c1.3.7 2.7 1 4.2 1a9.9 9.9 0 0 0 9.9-9.9c0-2.6-1-5-2.8-6.9z"/></svg>',
+  instagram: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><radialGradient id="ig" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="%23fdf497"/><stop offset="5%" stop-color="%23fdf497"/><stop offset="45%" stop-color="%23fd5949"/><stop offset="60%" stop-color="%23d6249f"/><stop offset="90%" stop-color="%23285AEB"/></radialGradient></defs><rect width="32" height="32" rx="8" fill="url(%23ig)"/><rect x="8" y="8" width="16" height="16" rx="5" fill="none" stroke="%23fff" stroke-width="2"/><circle cx="16" cy="16" r="4" fill="none" stroke="%23fff" stroke-width="2"/><circle cx="22" cy="10" r="1.2" fill="%23fff"/></svg>',
+  facebook:  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%231877F2"/><path fill="%23fff" d="M17.5 10.5h2.5V7.5H17a4 4 0 0 0-4 4V13H11v3h2v8h3v-8h2.5l.5-3H16v-1.5a1 1 0 0 1 1-1z"/></svg>',
+  tiktok:    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23010101"/><path fill="%23fff" d="M22 12.5a5.5 5.5 0 0 1-3.3-1.1v7.1a5.1 5.1 0 1 1-3.5-4.8v2.9a2.2 2.2 0 1 0 1.5 2.1V8h2.3a5.4 5.4 0 0 0 3 4.5z"/></svg>',
+  youtube:   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23FF0000"/><polygon fill="%23fff" points="13,11 22,16 13,21"/></svg>',
+  website:   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%2300BED9"/><circle cx="16" cy="16" r="9" fill="none" stroke="%23fff" stroke-width="2"/><line x1="16" y1="7" x2="16" y2="25" stroke="%23fff" stroke-width="1.5"/><line x1="7" y1="16" x2="25" y2="16" stroke="%23fff" stroke-width="1.5"/><ellipse cx="16" cy="16" rx="5" ry="9" fill="none" stroke="%23fff" stroke-width="1.5"/></svg>',
+  custom:    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%230c1727"/><circle cx="16" cy="16" r="7" fill="none" stroke="%2300BED9" stroke-width="2"/></svg>',
+};
+
+// Icon resolution with caching
+function iconFor(link) {
+  const cacheKey = `${link.id || ''}:${link.icon_source || ''}:${link.icon || ''}:${link.type || ''}:${link.url || ''}`;
+  
+  let icon;
+  if (link.icon_source === 'upload' && link.icon) {
+    icon = `assets/img/icons/${link.icon}`;
+  } else if (link.icon_source === 'type' && TYPE_ICONS[link.type]) {
+    icon = TYPE_ICONS[link.type];
+  } else if (link.icon_source === 'auto' || !link.icon_source || link.icon_source === '') {
+    if (TYPE_ICONS[link.type]) {
+      icon = TYPE_ICONS[link.type];
+    } else {
+      try {
+        const domain = new URL(link.url).hostname;
+        icon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+      } catch {
+        icon = TYPE_ICONS.custom;
+      }
+    }
+  } else {
+    icon = TYPE_ICONS.custom;
+  }
+  
+  return icon;
+}
+
+// SVG icons for branch actions
+const SVG = {
+  maps: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  wa:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+  link: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+  android: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.341a1 1 0 0 1-1.73-1l1.154-2a1 1 0 1 1 1.73 1zm-11.047 0 1.154-2a1 1 0 1 0-1.73-1l-1.154 2a1 1 0 1 0 1.73 1zM20 9H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1v3a1 1 0 0 0 2 0v-3h10v3a1 1 0 0 0 2 0v-3h1a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zM8.5 6.5a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm9 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zM6.76 8h10.48l-1.74-3.018A2 2 0 0 0 13.764 4h-3.528a2 2 0 0 0-1.732 1l-1.745 3z"/></svg>`,
+  apple:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>`,
+  copy:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+};
+
+// Link Card Component
+function LinkCard({ link }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(link.url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch (err) {
+      console.error('فشل نسخ الرابط:', err);
+    }
+  };
+
+  return (
+    <a className="link-card" href={link.url} target="_blank" rel="noopener noreferrer">
+      <img className="link-card__icon" src={iconFor(link)} alt="" loading="eager" />
+      <span className="link-card__title">{link.title}</span>
+      {(link.show_copy === true || link.show_copy === 'true' || link.show_copy === '1') && (
+        <button 
+          className="link-card__copy-btn" 
+          type="button" 
+          aria-label="نسخ الرابط"
+          onClick={handleCopy}
+          style={{ background: copied ? 'rgba(37,211,102,0.3)' : '', borderColor: copied ? 'rgba(37,211,102,0.5)' : '' }}
+        >
+          <span dangerouslySetInnerHTML={{ __html: SVG.copy }} />
+        </button>
+      )}
+    </a>
+  );
+}
+
+// Branch Card Component
+function BranchCard({ branch, settings }) {
+  const cardShape = settings?.appearance?.card_shape || '';
+  return (
+    <div className={`branch-card ${cardShape}`}>
+      <div className="branch-card__header">
+        <div className="branch-card__name">
+          {branch.name}
+          {branch.password && branch.password.trim() !== '' && (
+            <span className="branch-card__pwd-indicator" title="هذا الفرع محمي بكلمة مرور">🔒</span>
+          )}
+        </div>
+      </div>
+      {(branch.details_html || branch.details_text) && (
+        <div className="branch-card__details">
+          {branch.details_html ? (
+            <div dangerouslySetInnerHTML={{ __html: branch.details_html }} />
+          ) : (
+            <div>{branch.details_text}</div>
+          )}
+        </div>
+      )}
+      {branch.hours && (
+        <div className="branch-card__hours">{branch.hours}</div>
+      )}
+      <div className="branch-card__actions">
+        {branch.direct_link_url && (
+          <a className="branch-action-btn branch-action-btn--direct" href={branch.direct_link_url} target="_blank" rel="noopener noreferrer">
+            <span dangerouslySetInnerHTML={{ __html: SVG.link }} /> زيارة
+          </a>
+        )}
+        {branch.maps_url && (
+          <a className="branch-action-btn branch-action-btn--maps" href={branch.maps_url} target="_blank" rel="noopener noreferrer">
+            <span dangerouslySetInnerHTML={{ __html: SVG.maps }} /> الخريطة
+          </a>
+        )}
+        {branch.whatsapp && (
+          <a className="branch-action-btn branch-action-btn--wa" href={`https://wa.me/${branch.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">
+            <span dangerouslySetInnerHTML={{ __html: SVG.wa }} /> واتساب
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// App Block Component
+function AppBlock({ appLinks }) {
+  if (!appLinks || (!appLinks.android && !appLinks.ios)) return null;
+
+  return (
+    <div className="app-block">
+      {appLinks.android && (
+        <a className="app-btn" href={appLinks.android} target="_blank" rel="noopener noreferrer">
+          <span dangerouslySetInnerHTML={{ __html: SVG.android }} />
+          <span>Google Play</span>
+        </a>
+      )}
+      {appLinks.ios && (
+        <a className="app-btn" href={appLinks.ios} target="_blank" rel="noopener noreferrer">
+          <span dangerouslySetInnerHTML={{ __html: SVG.apple }} />
+          <span>App Store</span>
+        </a>
+      )}
+    </div>
+  );
+}
+
+// Header Component
+function Header({ settings }) {
+  return (
+    <header className="profile">
+      <div className="profile__logo-wrap" id="logoWrap">
+        <img 
+          className="profile__logo" 
+          id="logoImg"
+          src={settings.logo_url || 'assets/img/icons/icon_7cca60e9826a1b4d.jpg'}
+          alt="شعار AtoZ Store"
+          onError={(e) => e.target.style.opacity = '0'}
+        />
+      </div>
+      <h1 className="profile__name">{settings.store_name || 'AtoZ Store'}</h1>
+      <p className="profile__tagline">{settings.tagline || 'وجهتك الأولى في فلسطين | Expect More...'}</p>
+      {settings.bio_html && (
+        <div className="profile__bio" dangerouslySetInnerHTML={{ __html: settings.bio_html }} />
+      )}
+      <div className="profile__micro-btns" id="microBtns">
+        {settings.website_url && (
+          <a className="micro-btn" href={settings.website_url} target="_blank" rel="noopener noreferrer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10A15.3 15.3 0 0 1 8 12a15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span>{(() => {
+              try { return new URL(settings.website_url).hostname; } catch { return 'www.AtoZ.ps'; }
+            })()}</span>
+          </a>
+        )}
+        {settings.phone && (
+          <a className="micro-btn" href={`tel:${settings.phone.replace(/\s/g, '')}`}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.38 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56A16 16 0 0 0 16 16.56l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>{settings.phone}</span>
+          </a>
+        )}
+      </div>
+    </header>
+  );
+}
+
+// Tab Switcher Component
+function TabSwitcher({ activeTab, onTabChange }) {
+  return (
+    <nav className="tabs" role="tablist" aria-label="أقسام الصفحة">
+      <button 
+        className={`tab ${activeTab === 'links' ? 'tab--active' : ''}`} 
+        role="tab" 
+        aria-selected={activeTab === 'links'}
+        aria-controls="panel-links"
+        onClick={() => onTabChange('links')}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        روابطنا
+      </button>
+      <button 
+        className={`tab ${activeTab === 'branches' ? 'tab--active' : ''}`} 
+        role="tab" 
+        aria-selected={activeTab === 'branches'}
+        aria-controls="panel-branches"
+        onClick={() => onTabChange('branches')}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        فروعنا
+      </button>
+    </nav>
+  );
+}
+
+// Main App Component
+function App() {
+  const [loading, setLoading] = useState(true);
+  const [links, setLinks] = useState([]);
+  const [settings, setSettings] = useState({});
+  const [activeTab, setActiveTab] = useState('links');
+  const [copiedLink, setCopiedLink] = useState(null);
+
+  // Apply appearance settings
+  useEffect(() => {
+    if (!settings.appearance) return;
+    
+    const root = document.documentElement;
+    const a = settings.appearance;
+    
+    if (a.background_color) root.style.setProperty('--color-bg', a.background_color);
+    if (a.primary_color) root.style.setProperty('--color-primary', a.primary_color);
+    if (a.secondary_color) root.style.setProperty('--color-secondary', a.secondary_color);
+    if (a.header_bg) root.style.setProperty('--header-bg', a.header_bg);
+    if (a.header_text) root.style.setProperty('--header-text', a.header_text);
+    if (a.header_tagline) root.style.setProperty('--header-tagline', a.header_tagline);
+    if (a.footer_bg) root.style.setProperty('--footer-bg', a.footer_bg);
+    if (a.footer_text) root.style.setProperty('--footer-text', a.footer_text);
+    if (a.footer_border) root.style.setProperty('--footer-border', a.footer_border);
+    if (a.card_bg) root.style.setProperty('--card-bg', a.card_bg);
+    if (a.card_border) root.style.setProperty('--card-border', a.card_border);
+    if (a.card_text) root.style.setProperty('--card-text', a.card_text);
+    if (a.branch_bg) root.style.setProperty('--branch-bg', a.branch_bg);
+    if (a.branch_border) root.style.setProperty('--branch-border', a.branch_border);
+    if (a.branch_name) root.style.setProperty('--branch-name', a.branch_name);
+    if (a.branch_text) root.style.setProperty('--branch-text', a.branch_text);
+    if (a.branch_details_bg) root.style.setProperty('--branch-details-bg', a.branch_details_bg);
+    
+    document.body.classList.remove('layout-list', 'layout-grid');
+    document.body.classList.add(a.layout_style === 'grid' ? 'layout-grid' : 'layout-list');
+    
+    document.body.classList.remove('card-style-glass', 'card-style-elevated', 'card-style-outline', 'card-style-flat', 'card-style-spatial', 'spatial-glass');
+    const cardStyle = a.card_style || 'glass';
+    if (cardStyle === 'spatial-glass') {
+      document.body.classList.add('spatial-glass');
+      document.body.classList.add('card-style-spatial');
+    } else {
+      document.body.classList.add(`card-style-${cardStyle}`);
+    }
+    
+    if (a.card_shape) {
+      document.body.setAttribute('data-card-shape', a.card_shape);
+    }
+  }, [settings.appearance]);
+
+  // Apply logo style
+  useEffect(() => {
+    const shape = settings.logo_shape || 'circle';
+    const glow = settings.logo_glow !== false;
+    
+    document.body.classList.remove('logo-circle', 'logo-rounded', 'logo-original');
+    document.body.classList.add(`logo-${shape}`);
+    document.body.classList.toggle('logo-glow', glow);
+    
+    const wrap = document.getElementById('logoWrap');
+    if (wrap) {
+      wrap.style.borderRadius = shape === 'circle' ? '50%' : shape === 'rounded' ? '22px' : '0';
+    }
+  }, [settings.logo_shape, settings.logo_glow]);
+
+  // Handle URL query params for tab navigation
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view === 'branches') {
+      setActiveTab('branches');
+    } else if (view === 'links') {
+      setActiveTab('links');
+    }
+  }, []);
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [linksRes, settingsRes] = await Promise.all([
+          fetch('api/links.php', { cache: 'no-cache' }),
+          fetch('api/settings.php', { cache: 'no-cache' }),
+        ]);
+        
+        const linksData = await linksRes.json();
+        const settingsData = await settingsRes.json();
+        
+        setLinks(linksData.links || []);
+        setSettings(settingsData);
+        
+        // Inject tracking scripts
+        injectTrackingScripts(settingsData.tracking_scripts_head || '', 'head');
+        injectTrackingScripts(settingsData.tracking_scripts_body || '', 'body');
+        
+      } catch (err) {
+        console.error('[AtoZ] Failed to load page data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // Handle tab change
+  const handleTabChange = useCallback((panelName) => {
+    setActiveTab(panelName);
+    const url = new URL(window.location);
+    url.searchParams.set('view', panelName);
+    window.history.pushState({}, '', url);
+  }, []);
+
+  // Inject tracking scripts
+  const injectTrackingScripts = (scriptContent, position) => {
+    if (!scriptContent || scriptContent.trim() === '') return;
+    
+    const temp = document.createElement('div');
+    temp.innerHTML = scriptContent.trim();
+    
+    const targetContainer = position === 'head' 
+      ? document.getElementById('tracking-head-container')
+      : document.getElementById('tracking-body-container');
+    
+    if (!targetContainer) return;
+    
+    Array.from(temp.childNodes).forEach((node) => {
+      if (node.nodeName === 'SCRIPT') {
+        const scriptEl = document.createElement('script');
+        Array.from(node.attributes).forEach(attr => {
+          scriptEl.setAttribute(attr.name, attr.value);
+        });
+        
+        const scriptText = node.textContent;
+        if (scriptText && scriptText.trim()) {
+          try {
+            (0, eval)(scriptText.trim());
+            scriptEl.textContent = scriptText.trim();
+          } catch (e) {
+            console.error('[AtoZ] Error executing script:', e);
+            scriptEl.textContent = scriptText.trim();
+          }
+        }
+        targetContainer.appendChild(scriptEl);
+      }
+    });
+  };
+
+  // Sort branches by order
+  const sortedBranches = useMemo(() => {
+    if (!settings.branches) return [];
+    return [...settings.branches].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [settings.branches]);
+
+  if (loading) {
+    return (
+      <div className="page" id="page">
+        <div className="bg-orb bg-orb--1" aria-hidden="true"></div>
+        <div className="bg-orb bg-orb--2" aria-hidden="true"></div>
+        <div className="bg-orb bg-orb--3" aria-hidden="true"></div>
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-muted)' }}>
+          جاري التحميل...
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page" id="page">
+      {/* Ambient background orbs */}
+      <div className="bg-orb bg-orb--1" aria-hidden="true"></div>
+      <div className="bg-orb bg-orb--2" aria-hidden="true"></div>
+      <div className="bg-orb bg-orb--3" aria-hidden="true"></div>
+      
+      <Header settings={settings} />
+      
+      <TabSwitcher activeTab={activeTab} onTabChange={handleTabChange} />
+      
+      {/* Links Panel */}
+      {activeTab === 'links' && (
+        <section id="panel-links" role="tabpanel" aria-labelledby="tab-links" className="panel">
+          {settings.app_links && settings.app_links.app_block_position === 'top' && (
+            <AppBlock appLinks={settings.app_links} />
+          )}
+          
+          <nav className="links" id="linksList" aria-label="روابط التواصل">
+            {links.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '20px 0' }}>
+                لا توجد روابط متاحة حالياً
+              </p>
+            ) : (
+              links.map((link) => (
+                <LinkCard key={link.id} link={link} />
+              ))
+            )}
+          </nav>
+          
+          {(!settings.app_links || settings.app_links.app_block_position !== 'top') && (
+            <AppBlock appLinks={settings.app_links} />
+          )}
+        </section>
+      )}
+      
+      {/* Branches Panel */}
+      {activeTab === 'branches' && (
+        <section id="panel-branches" role="tabpanel" aria-labelledby="tab-branches" className="panel">
+          <div id="branchesList" className="branches-list">
+            {sortedBranches.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '20px 0' }}>
+                لا توجد فروع مضافة
+              </p>
+            ) : (
+              sortedBranches.map((branch) => (
+                <BranchCard key={branch.id} branch={branch} settings={settings} />
+              ))
+            )}
+          </div>
+        </section>
+      )}
+      
+      {/* Footer */}
+      <footer className="page__footer">
+        <span>
+          {settings.footer_text 
+            ? settings.footer_text.replace('{year}', new Date().getFullYear())
+            : `AtoZ Store © ${new Date().getFullYear()}`
+          }
+        </span>
+      </footer>
+    </div>
+  );
+}
+
+// Render the app
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+
+</script>
+</body>
+</html>
