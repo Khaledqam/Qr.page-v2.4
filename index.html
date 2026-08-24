@@ -26,6 +26,8 @@
 <link rel="sitemap" href="/sitemap.xml">
 <link rel="service-doc" href="/docs/api">
 <link rel="api-catalog" href="/.well-known/api-catalog">
+<!-- Google Search Console Verification (static for crawler access) -->
+<meta name="google-site-verification" content="WdIzDuZhi4tKrM4E9o-2aoHGDreWF1K4q9sJuthfamw" />
 <div id="tracking-head-container"></div>
 </head>
 <body>
@@ -395,7 +397,16 @@ function App() {
     if (!targetContainer) return;
     
     Array.from(temp.childNodes).forEach((node) => {
-      if (node.nodeName === 'SCRIPT') {
+      // Handle meta tags (like google-site-verification)
+      if (node.nodeName === 'META') {
+        const metaEl = document.createElement('meta');
+        Array.from(node.attributes).forEach(attr => {
+          metaEl.setAttribute(attr.name, attr.value);
+        });
+        targetContainer.appendChild(metaEl);
+      }
+      // Handle script tags
+      else if (node.nodeName === 'SCRIPT') {
         const scriptEl = document.createElement('script');
         Array.from(node.attributes).forEach(attr => {
           scriptEl.setAttribute(attr.name, attr.value);
