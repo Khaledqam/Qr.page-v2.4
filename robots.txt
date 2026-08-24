@@ -1,0 +1,44 @@
+# robots.txt for AtoZ.ps - أبو زهرة للإلكترونيات
+# https://qr.atoz.ps/
+
+# Sitemap location
+Sitemap: https://qr.atoz.ps/sitemap.xml
+
+# Default rules for all crawlers
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /assets/
+Allow: /api/links.php
+Disallow: /admin/
+Disallow: /data/
+Disallow: /*.json$
+Disallow: /api/approval.php
+Disallow: /api/auth.php
+Disallow: /api/settings.php
+Disallow: /api/upload.php
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Google-specific rules
+User-agent: Googlebot
+Allow: /
+Allow: /index.html
+Allow: /assets/
+Disallow: /admin/
+Disallow: /data/
+Disallow: /*.json$
+
+# Bing-specific rules
+User-agent: Bingbot
+Allow: /
+Allow: /index.html
+Allow: /assets/
+Disallow: /admin/
+Disallow: /data/
+Disallow: /*.json$
+
+# Block access to sensitive directories
+User-agent: *
+Disallow: /data/backups/

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- AtoZ.ps - أبو زهرة للإلكترونيات -->
+  <!-- Sitemap generated for https://qr.atoz.ps/ -->
+  
+  <!-- Main homepage -->
+  <url>
+    <loc>https://qr.atoz.ps/</loc>
+    <lastmod>2025-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Index page (canonical) -->
+  <url>
+    <loc>https://qr.atoz.ps/index.html</loc>
+    <lastmod>2025-08-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Public API endpoint for links -->
+  <url>
+    <loc>https://qr.atoz.ps/api/links.php</loc>
+    <lastmod>2025-08-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Assets directory (CSS) -->
+  <url>
+    <loc>https://qr.atoz.ps/assets/css/</loc>
+    <lastmod>2025-08-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Assets directory (JS) -->
+  <url>
+    <loc>https://qr.atoz.ps/assets/js/</loc>
+    <lastmod>2025-08-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Assets directory (Images) -->
+  <url>
+    <loc>https://qr.atoz.ps/assets/img/</loc>
+    <lastmod>2025-08-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
