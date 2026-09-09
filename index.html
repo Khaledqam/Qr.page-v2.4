@@ -26,13 +26,9 @@
 <link rel="sitemap" href="/sitemap.xml">
 <link rel="service-doc" href="/docs/api">
 <link rel="api-catalog" href="/.well-known/api-catalog">
-<!-- Google Search Console Verification (static for crawler access) -->
-<meta name="google-site-verification" content="WdIzDuZhi4tKrM4E9o-2aoHGDreWF1K4q9sJuthfamw" />
-<div id="tracking-head-container"></div>
 </head>
 <body>
 <div id="root"></div>
-<div id="tracking-body-container"></div>
 <script type="text/babel">
 
 /* =============================================================
@@ -390,20 +386,14 @@ function App() {
     const temp = document.createElement('div');
     temp.innerHTML = scriptContent.trim();
     
-    const targetContainer = position === 'head' 
-      ? document.getElementById('tracking-head-container')
-      : document.getElementById('tracking-body-container');
-    
-    if (!targetContainer) return;
-    
     Array.from(temp.childNodes).forEach((node) => {
-      // Handle meta tags (like google-site-verification)
+      // Handle meta tags (like google-site-verification) - add directly to document.head
       if (node.nodeName === 'META') {
         const metaEl = document.createElement('meta');
         Array.from(node.attributes).forEach(attr => {
           metaEl.setAttribute(attr.name, attr.value);
         });
-        targetContainer.appendChild(metaEl);
+        document.head.appendChild(metaEl);
       }
       // Handle script tags
       else if (node.nodeName === 'SCRIPT') {
@@ -415,14 +405,13 @@ function App() {
         const scriptText = node.textContent;
         if (scriptText && scriptText.trim()) {
           try {
-            (0, eval)(scriptText.trim());
             scriptEl.textContent = scriptText.trim();
           } catch (e) {
-            console.error('[AtoZ] Error executing script:', e);
+            console.error('[AtoZ] Error setting script content:', e);
             scriptEl.textContent = scriptText.trim();
           }
         }
-        targetContainer.appendChild(scriptEl);
+        document.body.appendChild(scriptEl);
       }
     });
   };
